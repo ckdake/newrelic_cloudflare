@@ -7,8 +7,8 @@ var CloudFlareAPI = require('cloudflare4');
 let config = require('config');
 
 var cfApi = new CloudFlareAPI({
-  email: config.get('cf.email'),
-  key: config.get('cf.key'),
+  email: process.env.CF_EMAIL,
+  key: process.env.CF_KEY,
   autoPagination: true,
   autoPaginationConcurrency: 5
 });
@@ -315,7 +315,7 @@ function newrelicPost() {
   data['agent'] = {};
   data['components'] = [];
 
-  data['agent']['host'] = config.get('nr_agent.host');
+  data['agent']['host'] = process.env.NR_HOST;
   data['agent']['version'] = '1.0.1';
 
   var component = {};
@@ -332,7 +332,7 @@ function newrelicPost() {
     method: 'POST',
     json: data,
     headers: {
-      'X-License-Key': config.get('nr_agent.key'),
+      'X-License-Key': process.env.NR_KEY,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     },
