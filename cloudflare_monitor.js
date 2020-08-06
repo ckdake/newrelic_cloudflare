@@ -4,7 +4,6 @@ var async = require('async');
 var request = require('request');
 var util = require('util');
 var CloudFlareAPI = require('cloudflare4');
-let config = require('config');
 
 var cfApi = new CloudFlareAPI({
   email: process.env.CF_EMAIL,
@@ -242,70 +241,6 @@ function getAnalytics(callback) {
 
     }
   });
-}
-
-
-function getRailgun() {
-  let railgun =  config.get('railgun');
-  if(railgun.length<=0) return;
-
-  cfData['summary_rg'] = [];
-  cfData['summary_rg']['bandwidth'] = 0;
-  cfData['summary_rg']['requests'] = 0;
-
-  async.each(config.get('railgun'), function (rg, callback) {
-
-    var url = "http://" + rg.ipAddress + ":" + rg.port;
-    request({url: url, json: true}, function (err, response, dataset) {
-      if (!err && response.statusCode == 200) {
-
-        var metric_id;
-
-        metric_id = 'Component/Cloudflare/Railgun/wanbps/' + rg.name + '_bandwidth[Bits/second]';
-        parsedMetrics[metric_id] = round(dataset['wan_bytes_sent'] / 60 * 8);
-        cfData['summary_rg']['bandwidth'] += parsedMetrics[metric_id];
-
-        metric_id = 'Component/Cloudflare/Railgun/http_requests/' + rg.name + '_requests[Requests/second]';
-        parsedMetrics[metric_id] = round(dataset['requests_started'] / 60);
-        cfData['summary_rg']['requests'] += parsedMetrics[metric_id];
-
-        metric_id = 'Component/Cloudflare/Railgun/compression/' + rg.name + '_compression[%]';
-        parsedMetrics[metric_id] = round((10000 - dataset['delta_compression_ratio']) / 100);
-
-        metric_id = 'Component/Cloudflare/Railgun/uncompressed/' + rg.name + '_uncompressed_chunks[Units]';
-        parsedMetrics[metric_id] = round(dataset['uncompressed_chunks'] / 60);
-
-        callback();
-
-      } else {
-        callback(err);
-      }
-    });
-
-  }, function (err) {
-    if (err) {
-      console.log(err); // One of the iterations produced an error.
-    } else {
-
-      // Summary
-      var metric_id;
-      metric_id = 'Component/Cloudflare_Summary/Bandwidth/railgun[Bits/second]';
-      parsedMetrics[metric_id] = round(cfData['summary_rg']['bandwidth']);
-
-      metric_id = 'Component/Cloudflare_Summary/Origin/Bandwidth/railgun[Bits/second]';
-      parsedMetrics[metric_id] = round(cfData['summary_rg']['bandwidth']);
-
-      // Railgun (RG vs Uncached Bandwidth)
-      metric_id = 'Component/Cloudflare/Railgun/rgvsuncached/rg_bandwidth[Bits/second]';
-      parsedMetrics[metric_id] = round(cfData['summary_rg']['bandwidth']);
-
-      // Railgun (RG vs Uncached Requests)
-      metric_id = 'Component/Cloudflare/Railgun/rgvsuncached_req/rg_requests[Requests/second]';
-      parsedMetrics[metric_id] = round(cfData['summary_rg']['requests']);
-
-    }
-  });
-
 }
 
 function newrelicPost() {
