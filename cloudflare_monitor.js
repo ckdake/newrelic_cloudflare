@@ -54,7 +54,6 @@ function getZoneIDs(callback) {
   parameters.status = 'active';
 
   cfApi.zoneGetAll(parameters).then(function (zones) {
-
     for (var i = 0; i < zones.length; i++) {
       var zone = {id: zones[i].id, name: zones[i].name, untiltime: 0};
       cfData['zones'][zone.id] = {};
@@ -89,10 +88,9 @@ function getAnalytics(callback) {
 
     var parameters = [];
     parameters.continuous = true;
-    parameters.since = -30;
-
+    parameters.since = -1800;
+    
     cfApi.zoneAnalyticsDashboardGet(zone.id, parameters).then(function (analytics) {
-
       var dataset = analytics.timeseries[analytics.timeseries.length - 1];
       var untiltime = Math.floor(Date.parse(dataset.until) / 1000);
 
