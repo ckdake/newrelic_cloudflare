@@ -1,3 +1,6 @@
+pushed to heroku, uses heroku ENV instead of config now. Upped timeline so the API would let me in to non-enterprise sites, waiting to see if the graphs make any sense...
+
+-------
 # Cloudflare Plugin for Newrelic
 
 Fetches metrics from Cloudflare and aggregates the data, providing one dashboard that covers multiple Cloudflare sites.
