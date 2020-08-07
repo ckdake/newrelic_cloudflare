@@ -25,7 +25,6 @@ function start() {
 
   // On startup, fetch and post
   getZoneIDs(function () {
-    getRailgun();
     getAnalytics(function () {
       newrelicPost();
     });
@@ -38,7 +37,6 @@ function start() {
   // Every minute getXenMetrics, followed by newrelicPost 30s later
   // We execute newrelicPost seperate from getAnalytics
   setInterval(function () {
-    getRailgun();
     getAnalytics(function () {});
 
     setTimeout(function () {
@@ -58,11 +56,9 @@ function getZoneIDs(callback) {
   cfApi.zoneGetAll(parameters).then(function (zones) {
 
     for (var i = 0; i < zones.length; i++) {
-      if (zones[i].plan.name == "Enterprise Website") {
-        var zone = {id: zones[i].id, name: zones[i].name, untiltime: 0};
-        cfData['zones'][zone.id] = {};
-        cfData['zones'][zone.id] = zone;
-      }
+      var zone = {id: zones[i].id, name: zones[i].name, untiltime: 0};
+      cfData['zones'][zone.id] = {};
+      cfData['zones'][zone.id] = zone;
     }
     callback();
   }).catch(function (error) {
