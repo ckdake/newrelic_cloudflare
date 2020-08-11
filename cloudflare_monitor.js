@@ -32,7 +32,7 @@ function start() {
 
   setInterval(function () {
     getZoneIDs(function () {});  // Every 60 minutes update getZoneIDs
-  }, 1000 * 60 * 120);
+  }, 1000 * 60 * 60);
 
   // Every minute getXenMetrics, followed by newrelicPost 30s later
   // We execute newrelicPost seperate from getAnalytics
@@ -42,7 +42,7 @@ function start() {
     setTimeout(function () {
       newrelicPost();
     }, 1000 * 30); // 30s
-  }, 1000 * 60 * 10); // 60s
+  }, 1000 * 60); // 60s
 }
 
 //////////////////////
